@@ -1,4 +1,4 @@
-# Lost & Found
+# IFI Lost & Found
 
 A web application for managing lost and found items at **Gymnázium Jana Keplera (gjk.cz)**. Students and staff can report found items and browse what has been handed in. 
 
