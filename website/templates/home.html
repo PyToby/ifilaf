@@ -1,0 +1,28 @@
+{#- ============================================================
+    IFILAF — home page: filter row + item grid. The grid IS the page.
+
+    Expected context:
+      items     list of item dicts, already filtered + sorted newest-first
+                { id, type, name, category, location, date, photo }
+      filters   { mine: bool, type: 'lost'|'found'|None, q: str }
+      current_user  { name, email } or None
+
+    Filters are plain links + a GET form — the server does the work,
+    no JS. Endpoints: home, item_detail.
+    ============================================================ -#}
+{% extends "base.html" %}
+{% from "components/item_card.html" import item_card %}
+
+{% block content %}
+<h1 class="sr-only">Lost and found items</h1>
+
+{% if items %}
+<div class="grid grid--stagger">
+  {% for item in items %}
+  {{ item_card(item, loop.index0) }}
+  {% endfor %}
+</div>
+{% else %}
+<p class="empty">No items here.</p>
+{% endif %}
+{% endblock %}

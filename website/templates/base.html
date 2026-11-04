@@ -1,0 +1,63 @@
+{#- ============================================================
+    IFILAF — base layout.
+    Every page extends this: head, skip link, sticky navbar, main.
+
+    Expected context on every request (set in a context processor):
+      current_user  { name, email } when signed in, else None/omit
+      wordmark      optional, defaults to 'IFILAF'
+
+    Endpoints used (rename in one place if yours differ):
+      home, login, logout, add_item
+    ============================================================ -#}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#ffffff">
+<title>{% block title %}{{ wordmark|default('IFILAF') }} — Lost &amp; Found{% endblock %}</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230a0a0a'/><path d='M11 8h4.5v12.5H23V25H11z' fill='%23fff'/></svg>">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+
+<body>
+{#- The account menu is a native <details>: opens/closes with zero JS.
+    app.js only adds outside-click and Escape dismissal. -#}
+
+<a class="skip" href="#main">Skip to items</a>
+
+<header class="nav">
+  <div class="nav__inner">
+    <a class="wordmark" href="{{ url_for('view.home') }}">{{ wordmark|default('IFILAF') }}</a>
+    <div class="nav__right">
+      {% if current_user %}
+      <a class="btn btn--primary" href="">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5.2v13.6M5.2 12h13.6"/></svg>
+        Add item
+      </a>
+      <details class="nav__user">
+        <summary class="avatar" aria-label="Account menu">Anonym</summary>
+        <div class="menu">
+          <p class="menu__email">{{ current_user.email }}</p>
+          <!-- SHOULD BE ROUTED TO LOGOUT
+          <form method="post" action="">
+            <button class="menu__item" type="submit">Sign out</button>
+          </form>-->
+        </div>
+      </details>
+      {% else %}
+      <!-- SHOULD BE ROUTED TO LOGIN-->
+      <a class="btn" href="">Login</a>
+      {% endif %}
+    </div>
+  </div>
+</header>
+
+<main id="main" tabindex="-1" class="is-enter">
+{% block content %}{% endblock %}
+</main>
+
+<script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+</body>
+</html>
