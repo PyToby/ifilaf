@@ -51,4 +51,4 @@ In the near future, a temporary website will be spun up for **development and te
 
 ## Authors
 
-Special thanks to [@jeohan19](https://www.github.com/jeohan19) and [@Onkvisu](https://www.github.com/onkvisu) for being able to develop this project. _Can be found in contributors tab._
+Special thanks to [@J1060](https://www.github.com/J1060) and [@Onkvisu](https://www.github.com/onkvisu) for being able to develop this project. _Can be found in contributors tab._
