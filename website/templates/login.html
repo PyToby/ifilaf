@@ -1,0 +1,44 @@
+{#- ============================================================
+    IFILAF — login page. One centered button, nothing else.
+
+    Expected context:
+      next        path to return to after login (hidden field), optional
+      login_error message to show (e.g. wrong school domain), optional
+      dev_login   truthy → also render the "non-school account" button
+                  used to test the domain restriction. Remove the
+                  block when real OAuth is wired up.
+
+    Endpoint: login (POST). Your view decides the domain rule.
+    ============================================================ -#}
+{% extends "base.html" %}
+{% from "components/icons.html" import google_icon %}
+
+{% block title %}Sign in — {{ wordmark|default('IFILAF') }}{% endblock %}
+
+{% block content %}
+<h1 class="sr-only">Sign in</h1>
+
+<div class="center">
+  <form method="post" action="{{ url_for('login') }}">
+    {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+    <button class="btn btn--lg" type="submit" name="account" value="school">
+      {{ google_icon(17) }}Continue with Google
+    </button>
+  </form>
+
+  {#- Dev-only: simulate signing in with a NON-school account to test
+      the domain-restriction error. Delete this block for production. -#}
+  {% if dev_login %}
+  <form method="post" action="{{ url_for('login') }}">
+    {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+    <button class="btn btn--ghost" type="submit" name="account" value="outside">
+      Simulate non-school account
+    </button>
+  </form>
+  {% endif %}
+
+  {% if login_error %}
+  <p class="login-err" role="alert">{{ login_error }}</p>
+  {% endif %}
+</div>
+{% endblock %}
