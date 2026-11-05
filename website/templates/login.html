@@ -19,26 +19,15 @@
 <h1 class="sr-only">Sign in</h1>
 
 <div class="center">
-  <form method="post" action="{{ url_for('login') }}">
+  <form method="post" action="{{ url_for('auth.login') }}">
     {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
     <button class="btn btn--lg" type="submit" name="account" value="school">
       {{ google_icon(17) }}Continue with Google
     </button>
   </form>
 
-  {#- Dev-only: simulate signing in with a NON-school account to test
-      the domain-restriction error. Delete this block for production. -#}
-  {% if dev_login %}
-  <form method="post" action="{{ url_for('login') }}">
-    {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
-    <button class="btn btn--ghost" type="submit" name="account" value="outside">
-      Simulate non-school account
-    </button>
-  </form>
-  {% endif %}
-
-  {% if login_error %}
-  <p class="login-err" role="alert">{{ login_error }}</p>
+  {% if error %}
+  <p class="login-err" role="alert">{{ error }}</p>
   {% endif %}
 </div>
 {% endblock %}

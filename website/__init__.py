@@ -1,6 +1,5 @@
 from flask import Flask, session
 from .extensions import db, login_manager
-#from oauthlib.oauth2 import WebApplicationClient
 import os, sys, logging, dotenv
 
 dotenv.load_dotenv()  
@@ -40,13 +39,10 @@ def create_app():
     login_manager.init_app(app)
 
     from .views import view
-    #from .auth import auth
+    from .auth import auth
 
     app.register_blueprint(view, url_prefix='/')
-    #app.register_blueprint(auth, url_prefix='/auth')
-
-    # OAuth 2 client setup
-    #client = WebApplicationClient(GOOGLE_CLIENT_ID)
+    app.register_blueprint(auth, url_prefix='/auth')
 
     create_database(app)
 
