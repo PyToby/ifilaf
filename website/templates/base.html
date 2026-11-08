@@ -51,12 +51,9 @@
           <p class="menu__email">
             {{ current_user.email }}
           </p>
-
-          <form method="post" action="{{ url_for('auth.logout') }}">
-            <button class="menu__item" type="submit">
-              Sign out
-            </button>
-          </form>
+            <form action="{{ url_for('auth.logout') }}" method="POST">
+                <button type="submit">Logout</button>
+            </form>
         </div>
       </details>
 
