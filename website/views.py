@@ -15,6 +15,14 @@ def home():
 
     if current_user.is_authenticated:
         print(f'Current user: {current_user.is_authenticated}')
-        return render_template('home.html', current_user, name=current_user.name)
+        return render_template('home.html',current_user=current_user, name=current_user.name)
     return render_template('home.html', current_user=False, items=items)
 
+@view.route('/add-item', methods=['GET', 'POST'])
+@login_required
+def add_item():
+    if request.method == 'POST':
+        #logika pro ukladani
+        pass
+
+    return render_template('add_item.html')
