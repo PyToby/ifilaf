@@ -13,21 +13,10 @@ def home():
 
     items = Items.query.all()
 
-@view.route('/')
-def home():
-    items = Items.query.all()
-
     if current_user.is_authenticated:
-        name = current_user.name
-    else:
-        name = None
-
-    return render_template(
-        'home.html',
-        current_user=current_user.is_authenticated,
-        name=name,
-        items=items
-    )
+        print(f'Current user: {current_user.is_authenticated}')
+        return render_template('home.html',current_user=current_user, name=current_user.name)
+    return render_template('home.html', current_user=False, items=items)
 
 @view.route('/add-item', methods=['GET', 'POST'])
 @login_required
