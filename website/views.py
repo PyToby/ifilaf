@@ -5,6 +5,15 @@ from .extensions import db
 
 view = Blueprint('view', __name__)
 
+class Item_Data:
+    def __init__(self, name=None, description=None, table=None, type=None, state=None, pictures=None):
+        self.name = name
+        self.pictures = pictures
+        self.description = description
+        self.table = table
+        self.type = type
+        self.state = state
+
 @view.route('/')
 def home():
     """
