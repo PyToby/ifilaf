@@ -39,7 +39,7 @@
 <div class="detail">
   <div class="d-media-col">
     <div class="dmedia">
-      {%- if item.photo -%}
+      {%- if False -%}
         <img src="{{ item.photo }}" alt="{{ item.name }}">
       {%- else -%}
         {{ icon(item.category or 'Other', 56) }}
@@ -59,36 +59,11 @@
     {% endif %}
 
     <dl class="dl">
-      {% if item.category %}
-      <div class="row"><dt>Category</dt><dd>{{ item.category }}</dd></div>
-      {% endif %}
-      <div class="row"><dt>Location</dt><dd>{{ item.location }}</dd></div>
-      <div class="row"><dt>{{ 'Found' if item.type == 'found' else 'Lost' }}</dt><dd><time datetime="{{ dt_attr(item.date) }}">{{ fmt_full(item.date) }}</time></dd></div>
-      {% if item.color %}
-      <div class="row"><dt>Color</dt><dd>{{ item.color }}</dd></div>
-      {% endif %}
-      {% if item.type == 'found' and item.current_location %}
-      <div class="row"><dt>Where it is now</dt><dd>{{ item.current_location }}</dd></div>
-      {% endif %}
-      <div class="row">
-        <dt>Contact</dt>
-        <dd><a class="link" href="mailto:{{ item.owner_email }}?subject={{ ((item.type == 'lost' and 'Lost item: ' or 'Found item: ') ~ item.name)|urlencode }}">{{ item.owner_email }}</a></dd>
-      </div>
+      {% for key, value in item.table.items() %}
+      <div class="row"><dt>{{ key }}</dt><dd>{{ value }}</dd></div>
+      {% endfor %}
     </dl>
 
-    {% if is_owner %}
-    <div class="actions">
-      <a class="btn btn--ghost" href="{{ url_for('edit_item', item_id=item.id) }}">Edit</a>
-      {% if item.status == 'open' %}
-      <form method="post" action="{{ url_for('resolve_item', item_id=item.id) }}">
-        <button class="btn btn--primary" type="submit">{{ icon('check', 15) }}Mark as resolved</button>
-      </form>
-      {% endif %}
-      <form method="post" action="{{ url_for('delete_item', item_id=item.id) }}" data-confirm="Delete this item?">
-        <button class="btn btn--ghost" type="submit">Delete</button>
-      </form>
-    </div>
-    {% endif %}
   </div>
 </div>
 {% endblock %}
