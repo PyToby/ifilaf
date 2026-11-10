@@ -44,7 +44,7 @@
 
       <details class="nav__user">
         <summary class="avatar" aria-label="Account menu">
-          {{ current_user.name }}
+          <img src="../static/profile.svg" alt="" width="32" height="32">
         </summary>
 
         <div class="menu">
@@ -52,7 +52,7 @@
             {{ current_user.email }}
           </p>
             <form action="{{ url_for('auth.logout') }}" method="POST">
-                <button type="submit">Logout</button>
+                <button class="btn btn--primary" type="submit">Logout</button>
             </form>
         </div>
       </details>

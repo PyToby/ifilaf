@@ -85,7 +85,7 @@ a{ color:inherit }
 .nav__user > summary::-webkit-details-marker{ display:none }
 .avatar{
   width:32px; height:32px; border-radius:50%; border:0; padding:0;
-  background:var(--ink); color:#fff; font-size:13px; font-weight:700;
+  background:var(--paper); color:#fff; font-size:13px; font-weight:700;
   display:grid; place-items:center; cursor:pointer;
   transition:transform 150ms var(--ease-out);
 }
