@@ -28,10 +28,12 @@ class Items(db.Model):
     description = db.Column(db.String(500), nullable=False)
     prize = db.Column(db.String(150), nullable=True)
     date = db.Column(db.DateTime, nullable=True, default=datetime.utcnow)
-    img = db.Column(db.String(300))
+    category = db.Column(db.String(300)) #clothing, electronics, other...
     user_email = db.Column(db.String(150), db.ForeignKey('user.email'), nullable=False)
     type = db.Column(db.String(150), nullable=True) #I found or I lost
     state = db.Column(db.String(150), nullable=True) #Pending, Closed, Archived 
+    location = db.Column(db.String(300), nullable=True) # found location
+    current_location = db.Column(db.String(300), nullable=True) # where the item is now, only for found type
 
     images = db.relationship('Image', backref='item', lazy=True)
 
