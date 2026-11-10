@@ -48,34 +48,32 @@ def add_item():
         date = request.form.get('date')
         prize = request.form.get('prize')
 
-        if type == 'lost':
+        if type == 'found':
             current_location = request.form.get('current_location')
 
             new_item = Items(
                 name=name,
                 description=description,
-                type='lost',
+                type=type,
                 prize=prize,
                 date=date,
                 location=location,
                 current_location=current_location,
                 category=category,
-                user_email=current_user.email,   # required, see below
+                user_email=current_user.email,
             )
-
-            db.session.add(new_item)
-            db.session.commit()
-        new_item = Items(
-            name=name,
-            description=description,
-            type='found',
-            prize=prize,
-            date=date,
-            location=location,
-            current_location=current_location,
-            category=category,
-            user_email=current_user.email,   # required, see below
-        )
+        else:
+            new_item = Items(
+                name=name,
+                description=description,
+                type=type,
+                prize=prize,
+                date=date,
+                location=location,
+                current_location=current_location,
+                category=category,
+                user_email=current_user.email,
+            )
 
         db.session.add(new_item)
         db.session.commit()
