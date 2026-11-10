@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, request, jsonify, Response, session, current_app
+from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import current_user, login_required
-from .models import Items
+from .models import Items, Image
 from .extensions import db
 
 view = Blueprint('view', __name__)
@@ -22,7 +22,45 @@ def home():
 @login_required
 def add_item():
     if request.method == 'POST':
-        #logika pro ukladani
-        pass
+        type = request.form.get('type')
+        name = request.form.get('name')
+        description = request.form.get('description')
+        category = request.form.get('category')
+        #images = request.form.get('photo')
+        location = request.form.get('location')
+        date = request.form.get('date')
+        prize = request.form.get('prize')
 
-    return render_template('add_item.html')
+        if type == 'lost':
+            current_location = request.form.get('current_location')
+
+            new_item = Items(
+                name=name,
+                description=description,
+                type='lost',
+                prize=prize,
+                date=date,
+                location=location,
+                current_location=current_location,
+                category=category,
+                user_email=current_user.email,   # required, see below
+            )
+
+            db.session.add(new_item)
+            db.session.commit()
+        new_item = Items(
+            name=name,
+            description=description,
+            type='found',
+            prize=prize,
+            date=date,
+            location=location,
+            current_location=current_location,
+            category=category,
+            user_email=current_user.email,   # required, see below
+        )
+
+        db.session.add(new_item)
+        db.session.commit()
+        return redirect(url_for("view.home"))
+    return render_template('item_add.html', categories=['Electronics', 'Clothing', 'Other'])
