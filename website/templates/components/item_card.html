@@ -11,7 +11,7 @@
 {% from "components/format.html" import fmt_short, dt_attr %}
 
 {% macro item_card(item, index=0) %}
-<a class="card" style="--i: {{ [index, 9]|min }}" href="{{ url_for('view.home', item_id=item.id) }}">
+<a class="card" style="--i: {{ [index, 9]|min }}" href="{{ url_for('view.display_item_detail', item_id=item.id) }}">
   <div class="card__media">
     {%- if item.photo -%}
       <img src="{{ item.photo }}" alt="{{ item.name }}" loading="lazy">

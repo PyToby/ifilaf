@@ -79,3 +79,21 @@ def add_item():
         db.session.commit()
         return redirect(url_for("view.home"))
     return render_template('item_add.html', categories=['Electronics', 'Clothing', 'Other'])
+
+@view.route("/item/<int:item_id>")
+def display_item_detail(item_id):
+
+    item = Items.query.filter_by(id=item_id).first()
+
+    item_data = Item_Data(item)
+
+    if not current_user.is_authenticated:
+        return render_template("item_detail.html",current_user=current_user, item=item_data)
+
+    item_data.authenticated()
+
+    if current_user.is_admin or current_user.email == item.user_email:
+        return render_template("item_edit.html",current_user=current_user,user_id=current_user.id, name=current_user.name, pfp=current_user.pfp, is_admin=current_user.is_admin, item=item_data)
+
+    else:
+        return render_template("item_detail.html",current_user=current_user, user_id=current_user.id, name=current_user.name, pfp=current_user.pfp, item=item_data)

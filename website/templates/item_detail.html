@@ -24,7 +24,7 @@
 {% block content %}
 {%- set is_owner = current_user and current_user.email == item.owner_email -%}
 
-<a class="back" href="{{ url_for('home') }}">{{ icon('back', 14) }}Items</a>
+<a class="back" href="{{ url_for('view.home') }}">{{ icon('back', 14) }}Items</a>
 
 {% if flash_success %}
 <div class="notice" role="status" tabindex="-1">
