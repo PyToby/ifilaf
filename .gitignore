@@ -2,3 +2,4 @@
 .vscode
 .env
 /website/__pycache__
+.idea
