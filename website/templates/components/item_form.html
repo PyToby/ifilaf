@@ -1,5 +1,6 @@
 {#- ============================================================
-    IFILAF — item form component (macro), shared by add and edit.
+    IFILAF — item form component (macro), shared by add and the
+    in-place edit mode on the item detail page.
     Single-column. Interactive behavior is CSS-only where possible:
       - segmented Type control: radio inputs + .seg__ind
       - "Where is the item now?" (Found only): .field--current via :has()
@@ -7,12 +8,12 @@
     Two tiny JS hooks remain in static/js/app.js: photo preview
     and inline validation of the two required fields.
 
-    Usage (from item_add.html / item_edit.html):
+    Usage (from item_add.html / item_detail.html):
       {% from "components/item_form.html" import item_form %}
       {{ item_form(action=…, categories=…, current_user=…, item=…, …) }}
 
     Params:
-      action        form POST target (url_for('add_item') / url_for('edit_item', item_id=…))
+      action        form POST target (url_for('add_item') / url_for('display_item_detail', item_id=…))
       categories    list of category names
       current_user  { name, email } — fills the read-only Contact field
       item          item dict for edit, or omit for add
@@ -20,11 +21,12 @@
                     validation error), takes precedence over item
       errors        dict field-name → message
       submit_label  button text (default 'Post item')
+      cancel_url    where Cancel goes (default: the item's detail page)
     ============================================================ -#}
 {% from "components/icons.html" import icon %}
 {% from "components/format.html" import dt_input %}
 
-{%- macro item_form(action, categories, current_user, item=none, values=none, errors=none, submit_label='Post item', item_id=None) -%}
+{%- macro item_form(action, categories, current_user, item=none, values=none, errors=none, submit_label='Post item', item_id=None, cancel_url=none) -%}
 {%- set err = errors or {} -%}
 {%- set val = values or {} -%}
 {%- set v_type = val.type if val.type is defined and val.type else (item.type if item else 'lost') -%}
@@ -95,9 +97,11 @@
     <p class="err" id="e-location" aria-live="polite" {{ 'hidden' if not err.get('location') }}>{{ err.get('location', '') }}</p>
   </div>
 
-  <div class="field">
+  <div class="field{% if err.get('date') %} is-error{% endif %}" id="f-date">
     <label class="label" for="in-date">Date and time <span class="opt">optional</span></label>
-    <input class="input" id="in-date" name="date" type="datetime-local" value="{{ v_date }}">
+    <input class="input" id="in-date" name="date" type="datetime-local" value="{{ v_date }}"
+           aria-describedby="e-date">
+    <p class="err" id="e-date" aria-live="polite" {{ 'hidden' if not err.get('date') }}>{{ err.get('date', '') }}</p>
   </div>
 
   <div class="field">
@@ -108,9 +112,10 @@
 
   <div class="field">
     <span class="label" id="l-contact">Contact</span>
-    <input class="input" type="text" id="in-contact" readonly value="{{ current_user.email }}"
+    <input class="input" type="text" id="in-contact" readonly
+           value="{{ (item.owner_email if item else none) or current_user.email }}"
            aria-labelledby="l-contact" aria-describedby="h-contact">
-    <p class="hint" id="h-contact">Your Google account email, shown on the listing.</p>
+    <p class="hint" id="h-contact">{{ 'The listing\u2019s contact email.' if item else 'Your Google account email, shown on the listing.' }}</p>
   </div>
 
   {#- Revealed by CSS when Type = Found; always visible where :has()
@@ -124,7 +129,8 @@
   <div class="form__actions">
     <button class="btn btn--primary btn--lg" type="submit">{{ submit_label }}</button>
     {% if item %}
-    <a class="btn btn--ghost btn--lg" href="{{ url_for('view.display_item_detail', item_id=item_id) }}">Cancel</a>
+    <a class="btn btn--ghost btn--lg"
+       href="{{ cancel_url or url_for('view.display_item_detail', item_id=item_id) }}">Cancel</a>
     {% endif %}
   </div>
 </form>

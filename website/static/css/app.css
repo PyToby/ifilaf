@@ -379,6 +379,14 @@ select{
 .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:24px }
 .actions form{ margin:0 }
 
+/* in-place edit: the item form takes the place of the read-only values */
+.inline-edit{ margin-top:24px; padding-top:22px; border-top:1px solid var(--g200) }
+.inline-edit .form{ max-width:100% }
+.inline-edit .field:last-of-type{ margin-bottom:0 }
+@media (min-width:900px){
+  .detail--editing .dmedia{ position:sticky; top:calc(var(--nav-h) + 20px) }
+}
+
 /* ------------------------------------------------------------
    8. LOGIN
    ------------------------------------------------------------ */
