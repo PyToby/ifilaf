@@ -18,7 +18,10 @@ class Item_Data:
             "prize": item.prize
         }
         self.__item__ = item
-    def authenticated(self): #add details for authenticated users
+    def authenticated(self):
+        """
+        Add details for authenticated users or not show them to non-authenticated users in order to keep sensitive info (e.g. email address).
+        """
         self.table["email"] = self.__item__.user_email
         
 
@@ -38,6 +41,9 @@ def home():
 @view.route('/add-item', methods=['GET', 'POST'])
 @login_required
 def add_item():
+    """
+    The route to add a new item to the database by an authenticated user, hence the @login_required decorator..
+    """
     if request.method == 'POST':
         type = request.form.get('type')
         name = request.form.get('name')
@@ -70,7 +76,6 @@ def add_item():
                 prize=prize,
                 date=date,
                 location=location,
-                current_location=current_location,
                 category=category,
                 user_email=current_user.email,
             )
@@ -82,7 +87,11 @@ def add_item():
 
 @view.route("/item/<int:item_id>")
 def display_item_detail(item_id):
-
+    """
+    Route to display a specific item detail page.
+    :param item_id: the item id
+    :return: __
+    """
     item = Items.query.filter_by(id=item_id).first()
 
     item_data = Item_Data(item)
