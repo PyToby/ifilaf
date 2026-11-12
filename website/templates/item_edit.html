@@ -19,7 +19,7 @@
 
 {% block content %}
 <h1 class="page-title">Edit item</h1>
-{{ item_form(action=url_for('edit_item', item_id=item.id), item=item,
+{{ item_form(action=url_for('view.display_item_detail', item_id=item_id), item=item,
              categories=categories, values=values, errors=errors,
-             current_user=current_user, submit_label='Save changes') }}
+             current_user=current_user, submit_label='Save changes', item_id=item_id) }}
 {% endblock %}

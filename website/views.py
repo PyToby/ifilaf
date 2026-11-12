@@ -23,7 +23,6 @@ class Item_Data:
         Add details for authenticated users or not show them to non-authenticated users in order to keep sensitive info (e.g. email address).
         """
         self.table["email"] = self.__item__.user_email
-        
 
 @view.route('/')
 def home():
@@ -97,12 +96,12 @@ def display_item_detail(item_id):
     item_data = Item_Data(item)
 
     if not current_user.is_authenticated:
-        return render_template("item_detail.html",current_user=current_user, item=item_data)
+        return render_template("item_detail.html", current_user=current_user, item=item_data, item_id=item_id)
 
     item_data.authenticated()
 
     if current_user.is_admin or current_user.email == item.user_email:
-        return render_template("item_edit.html",current_user=current_user,user_id=current_user.id, name=current_user.name, pfp=current_user.pfp, is_admin=current_user.is_admin, item=item_data)
+        return render_template("item_edit.html", current_user=current_user, user_id=current_user.id, name=current_user.name, pfp=current_user.pfp, is_admin=current_user.is_admin, item=item_data, item_id=item_id)
 
     else:
-        return render_template("item_detail.html",current_user=current_user, user_id=current_user.id, name=current_user.name, pfp=current_user.pfp, item=item_data)
+        return render_template("item_detail.html", current_user=current_user, user_id=current_user.id, name=current_user.name, pfp=current_user.pfp, item=item_data, item_id=item_id)
