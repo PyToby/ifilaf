@@ -67,6 +67,14 @@ def parse_date(value):
     except ValueError:
         return None, True
 
+def find_users(searched_string):
+    """
+    Find users by email or name.
+    """
+    query = User.query
+    if searched_string:
+        query = query.filter(User.email.ilike(f"%{searched_string}%")) | query.filter(User.name.ilike(f"%{searched_string}%"))
+    return query.all()
 
 @view.route('/')
 def home():
@@ -218,3 +226,24 @@ def display_administration():
     admins = User.query.filter_by(is_admin=True).all()
     return render_template('administration.html', current_user=current_user, admins=admins)
 
+@view.route("/administration/delete_admin/<int:user_id>")
+@login_required
+def delete_admin(user_id):
+    """
+    Route to delete an admin account from the database
+    """
+    if not current_user.is_admin:
+        abort(403)
+
+    user = User.query.get(user_id)
+    if user is None or not user.is_admin:
+        abort(404)
+
+    user.is_admin = False
+    db.session.commit()
+    return redirect(url_for('view.display_administration'))
+
+@view.route("/administration/add_admin/")
+@login_required
+def add_admin():
+    pass

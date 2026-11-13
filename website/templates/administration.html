@@ -1,6 +1,11 @@
 {% extends "base.html" %}
-{% from "components/account_management.html" import account_list_item %}
+{% from "components/account_management.html" import account_list_item_deletion, account_list_item_addition %}
 
 {% block content %}
-  {{ account_list_item('Admin 1') }}
+<div style="display:flex;">
+<h1 class="page-title" style="margin-right:10px">Administrators</h1>
+<a class = 'btn' href="{{ url_for('view.add_admin') }}">Add administrator</a></div>
+  {% for user in admins %}
+    {{ account_list_item_deletion(user, url_for('view.delete_admin', user_id=user.id)) }}
+  {% endfor %}
 {% endblock %}

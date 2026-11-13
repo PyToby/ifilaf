@@ -1,10 +1,19 @@
 {% from "components/icons.html" import icon %}
 
-{% macro account_list_item(name) -%}
+{% macro account_list_item_deletion(account,delete_url) -%}
 <div class="account-list-item">
-  <span class="account-list-item__name">{{ name }}</span>
-  <button class="account-list-item__delete" type="button" aria-label="Delete {{ name }}">
+  <span class="account-list-item__name">{{ account.name }}</span>
+  <a class="account-list-item__delete" href="{url_for('view.delete_admin', user_id=account.id)}" aria-label="Delete {{ account.name }}">
     {{ icon('delete', 16) }}
-  </button>
+  </a>
+</div>
+{%- endmacro %}
+
+{% macro account_list_item_addition(account,add_url) -%}
+<div class="account-list-item">
+  <span class="account-list-item__name">{{ account.name }}</span>
+  <a class="account-list-item__delete" href="{url_for('view.add_admin', user_id=account.id)}" aria-label="Add {{ account.name }}">
+    {{ icon('plus', 16) }}
+  </a>
 </div>
 {%- endmacro %}
