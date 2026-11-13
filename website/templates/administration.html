@@ -1,1 +1,6 @@
 {% extends "base.html" %}
+{% from "components/account_management.html" import account_list_item %}
+
+{% block content %}
+  {{ account_list_item('Admin 1') }}
+{% endblock %}

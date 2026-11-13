@@ -217,3 +217,4 @@ def display_administration():
 
     admins = User.query.filter_by(is_admin=True).all()
     return render_template('administration.html', current_user=current_user, admins=admins)
+

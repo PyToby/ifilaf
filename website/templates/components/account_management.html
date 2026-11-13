@@ -1,0 +1,10 @@
+{% from "components/icons.html" import icon %}
+
+{% macro account_list_item(name) -%}
+<div class="account-list-item">
+  <span class="account-list-item__name">{{ name }}</span>
+  <button class="account-list-item__delete" type="button" aria-label="Delete {{ name }}">
+    {{ icon('delete', 16) }}
+  </button>
+</div>
+{%- endmacro %}
