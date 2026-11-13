@@ -32,9 +32,11 @@
     </a>
 
     <div class="nav__right">
-
+      
       {% if current_user.is_authenticated %}
-
+      {% if current_user.is_admin %}
+      <a class="btn" href="{{ url_for('view.display_administration') }}"> Administration </a>
+      {% endif %}
       <a class="btn btn--primary" href="{{ url_for('view.add_item') }}">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M12 5.2v13.6M5.2 12h13.6"/>

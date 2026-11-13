@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, abort
 from flask_login import current_user, login_required
 
-from .models import Items, Image
+from .models import Items, Image, User
 from .extensions import db
 
 view = Blueprint('view', __name__)
@@ -205,3 +205,15 @@ def display_item_detail(item_id):
         show_contact=current_user.is_authenticated,
         flash_success='Changes saved.' if saved else None,
     )
+
+@view.route("/administration")
+@login_required
+def display_administration():
+    """
+    Route to display the administration page for editing admin accounts
+    """
+    if not current_user.is_admin:
+        abort(403)
+
+    admins = User.query.filter_by(is_admin=True).all()
+    return render_template('administration.html', current_user=current_user, admins=admins)
