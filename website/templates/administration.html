@@ -5,7 +5,7 @@
 {% block content %}
 <div style="display:flex;">
 <h1 class="page-title" style="margin-right:1rem">Administrators</h1>
-<a class = 'btn' href="{{ url_for('view.add_admin') }}">Add administrator</a></div>
+<a class = 'btn' href="{{ url_for('view.display_add_admin') }}">Add administrators</a></div>
 {{ search_field("search_for_admins", url_for('view.search_admins'), "Search for administrators", search_query) }}
 {% if not admins %}
 <p class="empty">No administrators found.</p>

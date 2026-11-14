@@ -241,6 +241,20 @@ def search_admins():
     admins = users.filter_by(is_admin=True).all()
     return render_template('administration.html', current_user=current_user, admins=admins, search_query=query)
 
+@view.route("/administration/search_users")
+@login_required
+def search_users():
+    """
+    Route to search for users by email or name.
+    """
+    if not current_user.is_admin:
+        abort(403)
+
+    query = request.args.get("search_for_users", "")
+
+    users = find_users_query(query).filter_by(is_admin=False).all()
+    return render_template('add_admin.html', current_user=current_user, users=users, search_query=query)
+
 @view.route("/administration/delete_admin/<int:user_id>")
 @login_required
 def delete_admin(user_id):
@@ -260,5 +274,26 @@ def delete_admin(user_id):
 
 @view.route("/administration/add_admin/")
 @login_required
-def add_admin():
-    return render_template('add_admin.html')
+def display_add_admin():
+    if not current_user.is_admin:
+        abort(403)
+        
+    users = User.query.filter_by(is_admin=False).all()
+    return render_template('add_admin.html', current_user=current_user, users=users, search_query='')
+
+@view.route("/administration/add_admin/<int:user_id>")
+@login_required
+def add_admin(user_id):
+    """
+    Route to add an admin account to the database
+    """
+    if not current_user.is_admin:
+        abort(403)
+
+    user = User.query.get(user_id)
+    if user is None or user.is_admin:
+        abort(404)
+
+    user.is_admin = True
+    db.session.commit()
+    return redirect(url_for('view.display_add_admin'))

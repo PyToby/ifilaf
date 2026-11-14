@@ -1,5 +1,21 @@
 {% extends "base.html" %}
+{% from "components/account_management.html" import account_list_item_deletion, account_list_item_addition, account_list_item %}
+{% from "components/universal.html" import search_field %}
+{% from "components/icons.html" import icon %}
 
 {% block content %}
-<h1>Add Administrator page</h1>
+<a class="back" href="{{ url_for('view.display_administration') }}">{{ icon('back', 14) }}Administrators</a>
+<h1 class="page-title" style="margin-right:1rem">Add administrators</h1>
+{{ search_field("search_for_users", url_for('view.search_users'), "Search for users", search_query) }}
+{% if not users %}
+<p class="empty">No users found.</p>
+{% else %}
+    {% for user in users %}
+    {% if user.id != current_user.id %}
+        {{ account_list_item_addition(user, url_for('view.display_add_admin', user_id=user.id)) }}
+    {% else %}
+        {{ account_list_item(user) }}
+    {% endif %}
+  {% endfor %}
+{% endif %}
 {% endblock %}

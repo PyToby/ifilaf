@@ -14,7 +14,7 @@
 {% macro account_list_item_addition(account,add_url) -%}
 <div class="account-list-item">
   <span class="account-list-item__name">{{ account.name }}</span>
-  <a class="account-list-item__delete" href="{{url_for('view.add_admin', user_id=account.id)}}" aria-label="Add {{ account.name }}">
+  <a class="account-list-item__add" href="{{url_for('view.add_admin', user_id=account.id)}}" aria-label="Add {{ account.name }}">
     {{ icon('plus', 16) }}
   </a>
 </div>
