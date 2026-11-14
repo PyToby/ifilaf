@@ -5,7 +5,7 @@
       - segmented Type control: radio inputs + .seg__ind
       - "Where is the item now?" (Found only): .field--current via :has()
       - location label swaps itself with Type via .lbl-lost/.lbl-found
-    Two tiny JS hooks remain in static/js/app.js: photo preview
+    Two tiny JS hooks remain in static/js/app.js: photo previews
     and inline validation of the two required fields.
 
     Usage (from item_add.html / item_detail.html):
@@ -37,6 +37,15 @@
 {%- set v_color = val.color if val.color is defined and val.color is not none else (item.color if item else '') -%}
 {%- set v_current = val.current_location if val.current_location is defined and val.current_location is not none else (item.current_location if item else '') -%}
 {%- set v_date = val.date if val.date is defined and val.date else (dt_input(item.date) if item and item.date else '') -%}
+{#- Existing photo to preview: the single .photo, or the first of item.photos. -#}
+{%- set v_photo = '' -%}
+{%- if item -%}
+  {%- if item.photo -%}
+    {%- set v_photo = item.photo -%}
+  {%- elif item.photos is defined and item.photos -%}
+    {%- set v_photo = item.photos[0] -%}
+  {%- endif -%}
+{%- endif -%}
 
 <form class="form" method="post" action="{{ action }}" enctype="multipart/form-data" novalidate data-item-form>
 
@@ -76,15 +85,18 @@
   </div>
 
   <div class="field">
-    <span class="label" id="l-photo">Photo <span class="opt">optional</span></span>
+    <span class="label" id="l-photo">Photos <span class="opt">optional</span></span>
     <div class="photo">
-      <input class="sr-only" type="file" id="in-photo" name="photo" accept="image/*" aria-labelledby="l-photo">
-      <label class="btn btn--ghost" for="in-photo">Choose photo</label>
-      <div class="photo__prev" id="photoPrev" {{ 'hidden' if not (item and item.photo) }}>
-        <img id="photoImg" src="{{ item.photo if item and item.photo else '' }}" alt="">
-        <button type="button" class="photo__x" data-remove-photo aria-label="Remove photo">{{ icon('x', 13) }}</button>
+      <input class="sr-only" type="file" id="in-photo" name="photo" accept="image/*" multiple
+             aria-labelledby="l-photo" aria-describedby="h-photo">
+      <label class="btn btn--ghost" for="in-photo">Choose photos</label>
+      <div class="photo__prev" id="photoPrev" {{ 'hidden' if not v_photo }}>
+        <img id="photoImg" src="{{ v_photo }}" alt="">
+        <button type="button" class="photo__x" data-remove-photo aria-label="Remove saved photo">{{ icon('x', 13) }}</button>
       </div>
+      <div class="photo__list" id="photoList"></div>
     </div>
+    <p class="hint" id="h-photo">You can attach more than one photo.</p>
   </div>
 
   <div class="field{% if err.get('location') %} is-error{% endif %}" id="f-location">

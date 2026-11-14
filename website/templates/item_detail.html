@@ -10,6 +10,10 @@
       item   Item_Data { id, name, type, category, description, date,
                          location, prize, current_location, photo,
                          owner_email, status }
+             photos: optional list of image paths. When the backend
+             supplies it the page renders every image as a gallery
+             (first one big, the rest as thumbnails); without it the
+             single item.photo is shown exactly as before.
       current_user  authenticated user or AnonymousUserMixin
       can_edit      True when the viewer may edit
       editing       True when the form should be shown
@@ -43,14 +47,40 @@
 {% endif %}
 
 <div class="detail{% if editing %} detail--editing{% endif %}">
+  {#- Photos: prefer the full list from the backend, fall back to one. -#}
+  {%- set photos = [] -%}
+  {%- if item.photos is defined and item.photos -%}
+    {%- set photos = item.photos -%}
+  {%- elif item.photo -%}
+    {%- set photos = [item.photo] -%}
+  {%- endif -%}
+
   <div class="d-media-col">
+    {%- if photos|length > 1 -%}
+    <div class="gallery" data-gallery>
+      <div class="dmedia">
+        <img class="gallery__main" src="{{ photos[0] }}" alt="{{ item.name }}">
+      </div>
+      <div class="gallery__thumbs">
+        {%- for photo in photos %}
+        <button type="button" class="gallery__thumb{{ ' is-active' if loop.first }}"
+                data-gallery-thumb data-src="{{ photo }}"
+                aria-label="Show photo {{ loop.index }} of {{ photos|length }}"
+                {% if loop.first %}aria-current="true"{% endif %}>
+          <img src="{{ photo }}" alt="" loading="lazy">
+        </button>
+        {%- endfor %}
+      </div>
+    </div>
+    {%- else -%}
     <div class="dmedia">
-      {%- if item.photo -%}
-        <img src="{{ item.photo }}" alt="{{ item.name }}">
+      {%- if photos -%}
+        <img src="{{ photos[0] }}" alt="{{ item.name }}">
       {%- else -%}
         {{ icon(item.category or 'Other', 56) }}
       {%- endif -%}
     </div>
+    {%- endif -%}
   </div>
 
   <div class="d-info">
