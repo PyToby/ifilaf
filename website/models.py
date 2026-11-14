@@ -41,5 +41,4 @@ class Image(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     pos = db.Column(db.Integer, nullable=False)
     image_path = db.Column(db.String(300), nullable=False)
-    image_name = db.Column(db.String(300), nullable=False)
     item_id = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)
