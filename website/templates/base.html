@@ -34,7 +34,7 @@
     <div class="nav__right">
       
       {% if current_user.is_authenticated %}
-      {% if True %}
+      {% if current_user.is_admin %}
       <a class="btn" href="{{ url_for('view.display_administration') }}"> Administration </a>
       {% endif %}
       <a class="btn btn--primary" href="{{ url_for('view.add_item') }}">

@@ -93,21 +93,35 @@
   }
 
   /* 4 — search clear button -------------------------------------- */
-  var search = document.querySelector('.search');
-  if (search) {
-    var input = search.querySelector('input[name="q"]');
+  document.querySelectorAll('.search').forEach(function (search) {
+    var input = search.querySelector('input[type="search"]');
     var clear = search.querySelector('[data-clear-search]');
+    if (!input) return;
+
+    var submitTimeout;
+    input.addEventListener('input', function () {
+      window.clearTimeout(submitTimeout);
+      submitTimeout = window.setTimeout(function () {
+        search.submit();
+      }, 600);
+    });
+
+    search.addEventListener('submit', function () {
+      window.clearTimeout(submitTimeout);
+    });
+
     if (clear) clear.addEventListener('click', function (e) {
-      e.preventDefault();                           // let the GET run without the button's value
+      e.preventDefault();
+      window.clearTimeout(submitTimeout);
       input.value = '';
       search.submit();
     });
-  }
+  });
 
-  /* 5 — delete confirmation on the detail page -------------------- */
-  document.querySelectorAll('form[data-confirm]').forEach(function (f) {
-    f.addEventListener('submit', function (e) {
-      if (!window.confirm(f.dataset.confirm)) e.preventDefault();
+  /* 5 — account management delete confirmation ------------------- */
+  document.querySelectorAll('a.account-list-item__delete[data-confirm]').forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      if (!window.confirm(link.dataset.confirm)) e.preventDefault();
     });
   });
 })();

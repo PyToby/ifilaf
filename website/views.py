@@ -67,14 +67,14 @@ def parse_date(value):
     except ValueError:
         return None, True
 
-def find_users(searched_string):
+def find_users_query(searched_string):
     """
     Find users by email or name.
     """
     query = User.query
     if searched_string:
-        query = query.filter(User.email.ilike(f"%{searched_string}%")) | query.filter(User.name.ilike(f"%{searched_string}%"))
-    return query.all()
+        query = query.filter(User.email.ilike(f"%{searched_string}%") | User.name.ilike(f"%{searched_string}%"))
+    return query
 
 @view.route('/')
 def home():
@@ -220,11 +220,26 @@ def display_administration():
     """
     Route to display the administration page for editing admin accounts
     """
-    """if not current_user.is_admin:
-        abort(403)"""
+    if not current_user.is_admin:
+        abort(403)
 
     admins = User.query.filter_by(is_admin=True).all()
-    return render_template('administration.html', current_user=current_user, admins=admins)
+    return render_template('administration.html', current_user=current_user, admins=admins, search_query='')
+
+@view.route("/administration/search_admins")
+@login_required
+def search_admins():
+    """
+    Route to search for administrators by email or name.
+    """
+    if not current_user.is_admin:
+        abort(403)
+
+    query = request.args.get("search_for_admins", "")
+
+    users = find_users_query(query)
+    admins = users.filter_by(is_admin=True).all()
+    return render_template('administration.html', current_user=current_user, admins=admins, search_query=query)
 
 @view.route("/administration/delete_admin/<int:user_id>")
 @login_required
@@ -246,4 +261,4 @@ def delete_admin(user_id):
 @view.route("/administration/add_admin/")
 @login_required
 def add_admin():
-    pass
+    return render_template('add_admin.html')

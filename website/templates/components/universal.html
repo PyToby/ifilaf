@@ -1,0 +1,14 @@
+{#- Reusable GET search field. Usage: {{ search_field(value=filters.q) }} -#}
+{% from "components/icons.html" import icon %}
+
+{% macro search_field(name, action, placeholder='Search...',value='') -%}
+<form class="search" method="get" action = {{action}} role="search" style="margin-bottom: 1rem;">
+  <div class="search__field">
+    <span class="search__ico">{{ icon('search', 16) }}</span>
+    <input type="search" name="{{ name }}" value="{{ value }}" placeholder="{{ placeholder }}" aria-label="{{ placeholder }}">
+    <button class="search__x" type="reset" data-clear-search aria-label="Clear search">
+      {{ icon('x', 14) }}
+    </button>
+  </div>
+</form>
+{%- endmacro %}

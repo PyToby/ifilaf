@@ -1,11 +1,21 @@
 {% extends "base.html" %}
-{% from "components/account_management.html" import account_list_item_deletion, account_list_item_addition %}
+{% from "components/account_management.html" import account_list_item_deletion, account_list_item_addition, account_list_item %}
+{% from "components/universal.html" import search_field %}
 
 {% block content %}
 <div style="display:flex;">
-<h1 class="page-title" style="margin-right:10px">Administrators</h1>
+<h1 class="page-title" style="margin-right:1rem">Administrators</h1>
 <a class = 'btn' href="{{ url_for('view.add_admin') }}">Add administrator</a></div>
-  {% for user in admins %}
-    {{ account_list_item_deletion(user, url_for('view.delete_admin', user_id=user.id)) }}
+{{ search_field("search_for_admins", url_for('view.search_admins'), "Search for administrators", search_query) }}
+{% if not admins %}
+<p class="empty">No administrators found.</p>
+{% else %}
+    {% for user in admins %}
+    {% if user.id != current_user.id %}
+        {{ account_list_item_deletion(user, url_for('view.delete_admin', user_id=user.id)) }}
+    {% else %}
+        {{ account_list_item(user) }}
+    {% endif %}
   {% endfor %}
+{% endif %}
 {% endblock %}
