@@ -4,7 +4,6 @@ import os
 import sys
 import logging
 import dotenv
-from .models import Items
 
 dotenv.load_dotenv()  
 
@@ -81,8 +80,6 @@ def create_app():
     )
 
     # --- Blueprints ---
-    from .models import Items
-
     from .views import view
     from .auth import auth
 
