@@ -251,6 +251,7 @@ select{
 }
 .notice__icon path{ stroke-dasharray:26; stroke-dashoffset:26; animation:draw 420ms var(--ease-out) 140ms forwards }
 
+.detail__text{color:var(--text-2); margin-right: auto; font-size: 0.9rem;}
 /* ------------------------------------------------------------
    5. FILTER ROW  (tabs/chips are links, search is a GET form)
    ------------------------------------------------------------ */
