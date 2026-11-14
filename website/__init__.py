@@ -1,5 +1,5 @@
 from flask import Flask
-from .extensions import db, login_manager, oauth
+from .extensions import db, login_manager, oauth, storage
 import os
 import sys
 import logging
@@ -52,6 +52,13 @@ def create_app():
 
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
+
+    # --- Supabase buckets ---
+    app.config["SUPABASE_URL"] = os.environ["SUPABASE_URL"]
+    app.config["SUPABASE_KEY"] = os.environ["SUPABASE_KEY"]
+    app.config["SUPABASE_BUCKET"] = "Images"
+
+    storage.init_app(app)
 
     # --- Google OAuth ---
     app.config['GOOGLE_CLIENT_ID'] = os.environ.get('GOOGLE_CLIENT_ID')
