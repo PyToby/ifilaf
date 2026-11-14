@@ -1,10 +1,9 @@
 from datetime import datetime
-
 from flask import Blueprint, render_template, request, redirect, url_for, abort
 from flask_login import current_user, login_required
-
 from .models import Items, Image, User
-from .extensions import db
+from .extensions import db, storage
+import uuid
 
 view = Blueprint('view', __name__)
 
@@ -89,6 +88,27 @@ def home():
         return render_template('home.html', current_user=current_user, name=current_user.name, items=items)
     return render_template('home.html', current_user=False, items=items)
 
+ALLOWED_EXTENSIONS = ['png', 'jpg', 'webp', 'jpeg']
+def allowed_extensions(file):
+    if file.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS:
+        return True
+    return False
+
+def save_photos(files):
+    saved = []
+    for f in files:
+        if not f or not f.filename:
+            continue
+        if not allowed_extensions(f.filename):
+            continue
+        # Picking a random name to avoid problems because I hate users...
+        ext = f.filename.rsplit(".", 1)[1].lower()
+        path = f"uploads/{uuid.uuid4().hex}.{ext}"
+
+        storage.bucket.upload(path=path, file=f.read(), file_options={"content-type": f.mimetype})
+        saved.append(path)
+    return saved
+
 
 @view.route('/add-item', methods=['GET', 'POST'])
 @login_required
@@ -101,7 +121,7 @@ def add_item():
         name = request.form.get('name')
         description = request.form.get('description')
         category = request.form.get('category')
-        #images = request.form.get('photo')
+        image_paths = save_photos(request.files.getlist("photo"))
         location = request.form.get('location')
         date = request.form.get('date')
         prize = request.form.get('prize')
@@ -133,7 +153,17 @@ def add_item():
             )
 
         db.session.add(new_item)
+        db.session.flush() # to add new_item in order to then retrieve its id given by the db
+
+        for i, image in enumerate(image_paths):
+            db.session.add(Image(
+                pos=i,
+                image_path=image,
+                item_id=new_item.id,
+            ))
+
         db.session.commit()
+        
         return redirect(url_for("view.home"))
     return render_template('item_add.html', categories=CATEGORIES)
 
