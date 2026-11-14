@@ -42,11 +42,11 @@ def callback():
 
         email = email.lower()
 
-        # Najdeme uživatele podle e-mailu
+        
         user = User.query.filter_by(email=email).first()
 
         if user is None:
-            # Pokud neexistuje, vytvoříme nového
+            # 
             user = User(
                 email=email,
                 name=userinfo.get('name') or email,
@@ -54,7 +54,7 @@ def callback():
             )
             db.session.add(user)
         else:
-            # Aktualizujeme základní údaje existujícího uživatele
+            #
             user.name = userinfo.get('name') or user.name
             user.pfp = userinfo.get('picture') or user.pfp
 
