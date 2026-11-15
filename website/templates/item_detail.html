@@ -47,10 +47,9 @@
 {% endif %}
 
 <div class="detail{% if editing %} detail--editing{% endif %}">
-  {#- Photos: prefer the full list from the backend, fall back to one. -#}
   {%- set photos = [] -%}
   {%- if item.photos is defined and item.photos -%}
-    {%- set photos = item.photos -%}
+    {%- set photos = photos -%}
   {%- elif item.photo -%}
     {%- set photos = [item.photo] -%}
   {%- endif -%}

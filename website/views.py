@@ -28,7 +28,8 @@ class Item_Data:
         self.prize = item.prize
         self.current_location = item.current_location
         self.owner_email = item.user_email
-        self.photo = item.images[0].image_path if item.images else None
+        self.photos = [img.url for img in item.images]
+        self.photo = self.photos[0] if self.photos else None
         self.__item__ = item
 
     @property
@@ -89,21 +90,34 @@ def home():
     return render_template('home.html', current_user=False, items=items)
 
 ALLOWED_EXTENSIONS = ['png', 'jpg', 'webp', 'jpeg']
-def allowed_extensions(file):
+def allowed_extensions(file: str) -> bool: 
+    """
+    A function to determine if a file extension is allowed.
+
+    :param file: Takes the file name.
+    :return: True or False
+    """
     if file.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS:
         return True
     return False
 
-def save_photos(files):
+def save_photos(files) -> list:
+    """
+    A function used by /add-item to save images to a db bucket.
+    
+    :param files: Takes the file objects requested from the html form.
+    :return: A list of file names to then save to a db table seperately
+    """
     saved = []
     for f in files:
         if not f or not f.filename:
             continue
         if not allowed_extensions(f.filename):
             continue
+
         # Picking a random name to avoid problems because I hate users...
         ext = f.filename.rsplit(".", 1)[1].lower()
-        path = f"uploads/{uuid.uuid4().hex}.{ext}"
+        path = f"uploads/{uuid.uuid4().hex}.{ext}" # The whole path in the specific bucket
 
         storage.bucket.upload(path=path, file=f.read(), file_options={"content-type": f.mimetype})
         saved.append(path)
@@ -153,7 +167,7 @@ def add_item():
             )
 
         db.session.add(new_item)
-        db.session.flush() # to add new_item in order to then retrieve its id given by the db
+        db.session.flush() # to add new_item in order to then retrieve its id given by the db 
 
         for i, image in enumerate(image_paths):
             db.session.add(Image(
