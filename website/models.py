@@ -1,8 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-#from sqlalchemy_imageattach.entity import Image, image_attachment
 from datetime import datetime 
+from .extensions import storage
 
 from .extensions import db
 
@@ -42,3 +42,7 @@ class Image(db.Model):
     pos = db.Column(db.Integer, nullable=False)
     image_path = db.Column(db.String(300), nullable=False)
     item_id = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)
+
+    @property
+    def url(self):
+        return storage.bucket.get_public_url(self.image_path)
