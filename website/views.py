@@ -8,7 +8,7 @@ import uuid
 view = Blueprint('view', __name__)
 
 CATEGORIES = ['Electronics', 'Clothing', 'Other']
-FILTERS=['All', 'Mine', 'Lost', 'Found', 'Archived']
+FILTERS=['All', 'Lost', 'Found', 'Archived']
 
 
 
@@ -68,7 +68,7 @@ def home():
 
     if current_user.is_authenticated:
         print(f'Current user: {current_user.is_authenticated}')
-        return render_template('home.html', current_user=current_user, name=current_user.name, items=items, filters=FILTERS)
+        return render_template('home.html', current_user=current_user, name=current_user.name, items=items, filters=['All', 'Mine', 'Lost', 'Found', 'Archived'])
     return render_template('home.html', current_user=False, items=items, filters=FILTERS)
 
 ALLOWED_EXTENSIONS = ['png', 'jpg', 'webp', 'jpeg']
