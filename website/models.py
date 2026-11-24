@@ -1,8 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+#from sqlalchemy_imageattach.entity import Image, image_attachment
 from datetime import datetime 
-from .extensions import storage
 
 from .extensions import db
 
@@ -12,6 +12,8 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String(150), nullable=False)
     pfp = db.Column(db.String(300))
     is_admin = db.Column(db.Boolean, default=False)
+    firstname = db.Column(db.String(150), nullable=False)
+    surname = db.Column(db.String(150), nullable=False)
 
     items = db.relationship('Items', backref='owner', lazy=True)
     #is_admin = db.Column(db.Boolean, default=False)
@@ -41,8 +43,5 @@ class Image(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     pos = db.Column(db.Integer, nullable=False)
     image_path = db.Column(db.String(300), nullable=False)
+    image_name = db.Column(db.String(300), nullable=False)
     item_id = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)
-
-    @property
-    def url(self):
-        return storage.bucket.get_public_url(self.image_path)
