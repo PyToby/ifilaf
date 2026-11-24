@@ -8,7 +8,7 @@ import uuid
 view = Blueprint('view', __name__)
 
 CATEGORIES = ['Electronics', 'Clothing', 'Other']
-
+ITEMS_PER_ITERATION = 10
 
 def categories_for(item):
     """
