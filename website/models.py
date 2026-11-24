@@ -12,8 +12,7 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String(150), nullable=False)
     pfp = db.Column(db.String(300))
     is_admin = db.Column(db.Boolean, default=False)
-    firstname = db.Column(db.String(150), nullable=False)
-    surname = db.Column(db.String(150), nullable=False)
+
 
     items = db.relationship('Items', backref='owner', lazy=True)
     #is_admin = db.Column(db.Boolean, default=False)
