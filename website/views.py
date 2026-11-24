@@ -45,7 +45,7 @@ def find_users_query(searched_string):
     """
     query = User.query
     if searched_string:
-        query = query.filter(User.email.ilike(f"%{searched_string}%") | User.name.ilike(f"%{searched_string}%"))
+        query = query.filter(User.email.ilike(f"%{searched_string}%") | User.name.ilike(f"%{searched_string}%")).order_by(User.name)
     return query
 
 @view.route('/')
