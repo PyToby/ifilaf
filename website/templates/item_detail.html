@@ -121,10 +121,10 @@
       {% if item.prize %}
       <div class="row"><dt>Prize</dt><dd>{{ item.prize }}</dd></div>
       {% endif %}
-      {% if show_contact and item.owner_email %}
+      {% if show_contact and item.user_email %}
       <div class="row">
         <dt>Contact</dt>
-        <dd><a class="link" href="mailto:{{ item.owner_email }}">{{ item.owner_email }}</a></dd>
+        <dd><a class="link" href="mailto:{{ item.user_email }}">{{ item.user_email }}</a></dd>
       </div>
       {% endif %}
     </dl>

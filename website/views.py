@@ -10,34 +10,6 @@ view = Blueprint('view', __name__)
 CATEGORIES = ['Electronics', 'Clothing', 'Other']
 
 
-class Item_Data:
-    """
-    Template-facing view of an item: the detail page and the inline edit form
-    both read the same flat attributes from it.
-    """
-
-    def __init__(self, item):
-        self.id = item.id
-        self.name = item.name
-        self.description = item.description
-        self.type = item.type
-        self.status = item.state
-        self.category = item.category
-        self.date = item.date
-        self.location = item.location
-        self.prize = item.prize
-        self.current_location = item.current_location
-        self.owner_email = item.user_email
-        self.photos = [img.url for img in item.images]
-        self.photo = self.photos[0] if self.photos else None
-        self.__item__ = item
-
-    @property
-    def color(self):
-        """The form component calls the prize field 'color'."""
-        return self.prize
-
-
 def categories_for(item):
     """
     Category choices for the form, keeping a custom value selectable.
@@ -239,18 +211,16 @@ def display_item_detail(item_id):
                 url_for('view.display_item_detail', item_id=item.id, saved=1)
             )
 
-    item_data = Item_Data(item)
-
     saved = request.args.get('saved') == '1'
 
     return render_template(
         "item_detail.html",
         current_user=current_user,
-        item=item_data,
+        item=item,
         item_id=item.id,
         editing=editable and (request.method == 'POST' or request.args.get('edit') == '1'),
         can_edit=editable,
-        categories=categories_for(item_data),
+        categories=categories_for(item),
         values=values,
         errors=errors,
         submit_label='Save changes',
