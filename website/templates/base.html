@@ -69,6 +69,71 @@
   </div>
 </header>
 
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="notifications" aria-live="polite">
+      {% for category, message in messages %}
+        <div class="notification notification--{{ category }}" role="alert">
+
+          <div class="notification__icon">
+            {% if category == 'error' %}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3 2.8 19a1.5 1.5 0 0 0 1.3 2.2h15.8a1.5 1.5 0 0 0 1.3-2.2L12 3Z"/>
+                <path d="M12 9v4M12 17h.01"/>
+              </svg>
+            {% elif category == 'success' %}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m5 12 4 4L19 6"/>
+              </svg>
+            {% else %}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9"/>
+                <path d="M12 8v5M12 16h.01"/>
+              </svg>
+            {% endif %}
+          </div>
+
+          <div class="notification__content">
+            <strong class="notification__title">
+              {% if category == 'error' %}
+                Přihlášení zamítnuto
+              {% elif category == 'success' %}
+                Operace úspěšná
+              {% else %}
+                Upozornění
+              {% endif %}
+            </strong>
+
+            <p>{{ message }}</p>
+
+            {% if category == 'error' %}
+              <span class="notification__hint">
+                Zkontrolujte použitý Google účet a zkuste to znovu.
+              </span>
+            {% endif %}
+          </div>
+
+          <button class="notification__close"
+                  type="button"
+                  aria-label="Zavřít upozornění"
+                  onclick="this.closest('.notification').remove()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round">
+              <path d="m18 6-12 12M6 6l12 12"/>
+            </svg>
+          </button>
+
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+
 <main id="main" tabindex="-1" class="is-enter">
 {% block content %}{% endblock %}
 </main>

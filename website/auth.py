@@ -41,21 +41,39 @@ def callback():
             return redirect(url_for('view.home'))
 
         email = email.lower()
+   
+        if not email.endswith('@gjk.cz'):
+            flash('Přihlášení je povoleno pouze pomocí školního e-mailu @gjk.cz.', 'error')
+            return redirect(url_for('view.home'))
 
-        # Najdeme uživatele podle e-mailu
+
+        user = User.query.filter_by(email=email).first()
+        name = (userinfo.get('name') or '').strip()
+        parts = name.split(maxsplit=1)
+
+        firstname = parts[0] if parts else None
+        surname = parts[1] if len(parts) > 1 else None
+
+
         user = User.query.filter_by(email=email).first()
 
         if user is None:
-            # Pokud neexistuje, vytvoříme nového
+  
             user = User(
                 email=email,
-                name=userinfo.get('name') or email,
+                name=name or email,
+                firstname=firstname,
+                surname=surname,
                 pfp=userinfo.get('picture')
             )
+
             db.session.add(user)
+
         else:
-            # Aktualizujeme základní údaje existujícího uživatele
-            user.name = userinfo.get('name') or user.name
+
+            user.name = name or user.name
+            user.firstname = firstname or user.firstname
+            user.surname = surname or user.surname
             user.pfp = userinfo.get('picture') or user.pfp
 
         db.session.commit()
