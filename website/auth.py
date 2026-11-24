@@ -58,7 +58,6 @@ def callback():
         user = User.query.filter_by(email=email).first()
 
         if user is None:
-  
             user = User(
                 email=email,
                 name=name or email,
@@ -70,7 +69,6 @@ def callback():
             db.session.add(user)
 
         else:
-
             user.name = name or user.name
             user.firstname = firstname or user.firstname
             user.surname = surname or user.surname

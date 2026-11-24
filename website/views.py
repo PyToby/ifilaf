@@ -1,41 +1,16 @@
 from datetime import datetime
-
 from flask import Blueprint, render_template, request, redirect, url_for, abort
 from flask_login import current_user, login_required
-
-from .models import Items, Image
-from .extensions import db
+from .models import Items, Image, User
+from .extensions import db, storage
+import uuid
 
 view = Blueprint('view', __name__)
 
 CATEGORIES = ['Electronics', 'Clothing', 'Other']
+ITEMS_PER_ITERATION = 10
+FILTERS=['All', 'Mine', 'Lost', 'Found', 'Archived']
 
-
-class Item_Data:
-    """
-    Template-facing view of an item: the detail page and the inline edit form
-    both read the same flat attributes from it.
-    """
-
-    def __init__(self, item):
-        self.id = item.id
-        self.name = item.name
-        self.description = item.description
-        self.type = item.type
-        self.status = item.state
-        self.category = item.category
-        self.date = item.date
-        self.location = item.location
-        self.prize = item.prize
-        self.current_location = item.current_location
-        self.owner_email = item.user_email
-        self.photo = item.images[0].image_path if item.images else None
-        self.__item__ = item
-
-    @property
-    def color(self):
-        """The form component calls the prize field 'color'."""
-        return self.prize
 
 
 def categories_for(item):
@@ -67,19 +42,69 @@ def parse_date(value):
     except ValueError:
         return None, True
 
+def find_users_query(searched_string):
+    """
+    Find users by email or name.
+    """
+    query = User.query
+    if searched_string:
+        query = query.filter(User.email.ilike(f"%{searched_string}%") | User.name.ilike(f"%{searched_string}%")).order_by(User.name)
+    return query
 
 @view.route('/')
 def home():
     """
     The function returning the homepage for everyone and deciding whether to display a logged in version or not.
     """
+    filter_type = request.args.get('filter')
+    if filter_type is None or filter_type == 'all':
+        items = Items.query.all()
+    elif filter_type in ['lost', 'found']:
+        items = Items.query.filter_by(type=filter_type).all()
+    elif filter_type == 'archived':
+        items = Items.query.filter_by(state='archived').all()
+    elif filter_type == 'mine':
+        items = Items.query.filter_by(user_email=current_user.email).all()
 
-    items = Items.query.all()
 
     if current_user.is_authenticated:
         print(f'Current user: {current_user.is_authenticated}')
-        return render_template('home.html', current_user=current_user, name=current_user.name, items=items)
-    return render_template('home.html', current_user=False, items=items)
+        return render_template('home.html', current_user=current_user, name=current_user.name, items=items, filters=['All', 'Mine', 'Lost', 'Found', 'Archived'])
+    return render_template('home.html', current_user=False, items=items, filters=FILTERS)
+
+ALLOWED_EXTENSIONS = ['png', 'jpg', 'webp', 'jpeg']
+def allowed_extensions(file: str) -> bool: 
+    """
+    A function to determine if a file extension is allowed.
+
+    :param file: Takes the file name.
+    :return: True or False
+    """
+    if file.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS:
+        return True
+    return False
+
+def save_photos(files) -> list:
+    """
+    A function used by /add-item to save images to a db bucket.
+    
+    :param files: Takes the file objects requested from the html form.
+    :return: A list of file names to then save to a db table seperately
+    """
+    saved = []
+    for f in files:
+        if not f or not f.filename:
+            continue
+        if not allowed_extensions(f.filename):
+            continue
+
+        # Picking a random name to avoid problems because I hate users...
+        ext = f.filename.rsplit(".", 1)[1].lower()
+        path = f"uploads/{uuid.uuid4().hex}.{ext}" # The whole path in the specific bucket
+
+        storage.bucket.upload(path=path, file=f.read(), file_options={"content-type": f.mimetype})
+        saved.append(path)
+    return saved
 
 
 @view.route('/add-item', methods=['GET', 'POST'])
@@ -93,7 +118,7 @@ def add_item():
         name = request.form.get('name')
         description = request.form.get('description')
         category = request.form.get('category')
-        #images = request.form.get('photo')
+        image_paths = save_photos(request.files.getlist("photo"))
         location = request.form.get('location')
         date = request.form.get('date')
         prize = request.form.get('prize')
@@ -125,7 +150,17 @@ def add_item():
             )
 
         db.session.add(new_item)
+        db.session.flush() # to add new_item in order to then retrieve its id given by the db 
+
+        for i, image in enumerate(image_paths):
+            db.session.add(Image(
+                pos=i,
+                image_path=image,
+                item_id=new_item.id,
+            ))
+
         db.session.commit()
+        
         return redirect(url_for("view.home"))
     return render_template('item_add.html', categories=CATEGORIES)
 
@@ -187,21 +222,103 @@ def display_item_detail(item_id):
                 url_for('view.display_item_detail', item_id=item.id, saved=1)
             )
 
-    item_data = Item_Data(item)
-
     saved = request.args.get('saved') == '1'
 
     return render_template(
         "item_detail.html",
         current_user=current_user,
-        item=item_data,
+        item=item,
         item_id=item.id,
         editing=editable and (request.method == 'POST' or request.args.get('edit') == '1'),
         can_edit=editable,
-        categories=categories_for(item_data),
+        categories=categories_for(item),
         values=values,
         errors=errors,
         submit_label='Save changes',
         show_contact=current_user.is_authenticated,
         flash_success='Changes saved.' if saved else None,
     )
+
+@view.route("/administration")
+@login_required
+def display_administration():
+    """
+    Route to display the administration page for editing admin accounts
+    """
+    if not current_user.is_admin:
+        abort(403)
+
+    admins = User.query.filter_by(is_admin=True).all()
+    return render_template('administration.html', current_user=current_user, admins=admins, search_query='')
+
+@view.route("/administration/search_admins")
+@login_required
+def search_admins():
+    """
+    Route to search for administrators by email or name.
+    """
+    if not current_user.is_admin:
+        abort(403)
+
+    query = request.args.get("search_for_admins", "")
+
+    users = find_users_query(query)
+    admins = users.filter_by(is_admin=True).all()
+    return render_template('administration.html', current_user=current_user, admins=admins, search_query=query)
+
+@view.route("/administration/search_users")
+@login_required
+def search_users():
+    """
+    Route to search for users by email or name.
+    """
+    if not current_user.is_admin:
+        abort(403)
+
+    query = request.args.get("search_for_users", "")
+
+    users = find_users_query(query).filter_by(is_admin=False).all()
+    return render_template('add_admin.html', current_user=current_user, users=users, search_query=query)
+
+@view.route("/administration/delete_admin/<int:user_id>")
+@login_required
+def delete_admin(user_id):
+    """
+    Route to delete an admin account from the database
+    """
+    if not current_user.is_admin:
+        abort(403)
+
+    user = User.query.get(user_id)
+    if user is None or not user.is_admin:
+        abort(404)
+
+    user.is_admin = False
+    db.session.commit()
+    return redirect(url_for('view.display_administration'))
+
+@view.route("/administration/add_admin/")
+@login_required
+def display_add_admin():
+    if not current_user.is_admin:
+        abort(403)
+        
+    users = User.query.filter_by(is_admin=False).all()
+    return render_template('add_admin.html', current_user=current_user, users=users, search_query='')
+
+@view.route("/administration/add_admin/<int:user_id>")
+@login_required
+def add_admin(user_id):
+    """
+    Route to add an admin account to the database
+    """
+    if not current_user.is_admin:
+        abort(403)
+
+    user = User.query.get(user_id)
+    if user is None or user.is_admin:
+        abort(404)
+
+    user.is_admin = True
+    db.session.commit()
+    return redirect(url_for('view.display_add_admin'))
